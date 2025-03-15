@@ -1,0 +1,14 @@
+{
+  "name": "mealmover",
+  "version": "1.0.0",
+  "description": "food delevery app",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "mathiyazhagan G",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel": "^2.13.3"
+  }
+}
