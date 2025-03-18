@@ -5,7 +5,9 @@ import Body from '../components/Body';
 import Error from '../components/Error';
 import About from '../components/About';
 import Deals from '../components/Deals';
-import { createBrowserRouter,RouterProvider } from 'react-router';
+import { createBrowserRouter,Outlet,RouterProvider } from 'react-router';
+import Menu from '../components/Menu';
+
 
 
 
@@ -19,7 +21,7 @@ const App = () => {
   return (
     <div>
       <Header />
-      <Body />
+      <Outlet />
     </div>
   )
 }
@@ -28,23 +30,33 @@ const AppRouter = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    children: [
+      {
+        path: "/home",
+        element: <Body />,
+        errorElement:<Error/>
+      },
+      {
+        path: "/about",
+        element: <About/>,
+        errorElement:<Error/>
+      },
+      {
+        path: "/deals",
+        element: <Deals/>,
+        errorElement:<Error/>
+      
+    },
+    {
+      path: "/restaurant/:id",
+      element: <Menu/>,
+    }
+      
+      
+    ],
     errorElement:<Error/>
   },
-  {
-    path: "/home",
-    element: <App />,
-    errorElement:<Error/>
-  },
-  {
-    path: "/about",
-    element: <About/>,
-    errorElement:<Error/>
-  },
-  {
-    path: "/deals",
-    element: <Deals/>,
-    errorElement:<Error/>
-  }
+ 
   
 ]);
 

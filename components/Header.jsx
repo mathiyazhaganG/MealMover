@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDom from 'react-dom/client';
+import { Link } from 'react-router';
 
 const Header = () => {
   return (
@@ -41,9 +42,9 @@ const Header = () => {
 
             {/* Navigation Items - Visible on all screen sizes */}
             <div className="flex items-center space-x-2 md:space-x-8">
-              <a href="#" className="text-gray-700 hover:text-orange-500 px-1 md:px-3 py-2 text-sm md:text-base font-medium">Home</a>
-              <a href="#" className="text-gray-700 hover:text-orange-500 px-1 md:px-3 py-2 text-sm md:text-base font-medium">About us</a>
-              <a href="#" className="text-gray-700 hover:text-orange-500 px-1 md:px-3 py-2 text-sm md:text-base font-medium">Deals</a>
+             <Link to="/home"  className="text-gray-700 hover:text-orange-500 px-1 md:px-3 py-2 text-sm md:text-base font-medium">Home</Link>
+              <Link to="/about" className="text-gray-700 hover:text-orange-500 px-1 md:px-3 py-2 text-sm md:text-base font-medium">About us</Link>
+              <Link to="/deals" className="text-gray-700 hover:text-orange-500 px-1 md:px-3 py-2 text-sm md:text-base font-medium">Deals</Link>
             </div>
           </div>
         </div>

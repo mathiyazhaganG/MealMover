@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { IMG_URL } from "../utils/constants";
 import ShimmerCard from "./Shimmer";
+import { Link } from "react-router";
 
 const Restcards = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -13,12 +14,14 @@ const Restcards = () => {
         "https://www.swiggy.com/mapi/restaurants/list/v5?offset=0&is-seo-homepage-enabled=true&lat=12.2252841&lng=79.07469569999999&carousel=true&third_party_vendor=1"
       );
       const data = await response.json();
+      console.log(data);
       
 
       // Extract the restaurants safely from API response
       const fetchedRestaurants =
-        data?.data?.cards[4]?.card?.card?.gridElements
+        data?.data?.cards[3]?.card?.card?.gridElements
           ?.infoWithStyle?.restaurants || [];
+          console.log(fetchedRestaurants);
     
 
       setRestaurants(fetchedRestaurants);
@@ -85,7 +88,7 @@ const Restcards = () => {
       <div className="max-w-6xl mx-auto py-8 px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredRestaurants.length > 0 ? (
           filteredRestaurants.map((restaurant, index) => (
-            <div key={index} className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+            <Link to={`/restaurant/${restaurant?.info?.id}`} key={index} className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
               <img
                 src={IMG_URL + restaurant?.info?.cloudinaryImageId}
                 alt={restaurant?.info?.name}
@@ -96,7 +99,7 @@ const Restcards = () => {
                 <p className="text-gray-600">{restaurant?.info?.cuisines?.join(", ")}</p>
                 <p className="text-orange-500 font-semibold">⭐ {restaurant?.info?.avgRating}</p>
               </div>
-            </div>
+            </Link>
           ))
         ) : (
           <p className="text-center text-gray-500 text-lg col-span-full">No restaurants found.</p>
