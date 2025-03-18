@@ -13,11 +13,13 @@ const Restcards = () => {
         "https://www.swiggy.com/mapi/restaurants/list/v5?offset=0&is-seo-homepage-enabled=true&lat=12.2252841&lng=79.07469569999999&carousel=true&third_party_vendor=1"
       );
       const data = await response.json();
+      
 
       // Extract the restaurants safely from API response
       const fetchedRestaurants =
-        data?.data?.cards?.find((card) => card?.card?.card?.gridElements)?.card?.card?.gridElements
+        data?.data?.cards[4]?.card?.card?.gridElements
           ?.infoWithStyle?.restaurants || [];
+    
 
       setRestaurants(fetchedRestaurants);
       setFilteredRestaurants(fetchedRestaurants);
