@@ -8,6 +8,7 @@ const Menu = () => {
 	const [Head, setHead] = useState({});
 	const [Menu, setMenu] = useState([]);
 	const { id } = useParams();
+	
 	const fetchmenu = async () => {
 		const response = await fetch(MENU_URL + id);
 		const data = await response.json();

@@ -19,7 +19,7 @@ const Restcards = () => {
 
       // Extract the restaurants safely from API response
       const fetchedRestaurants =
-        data?.data?.cards[2]?.card?.card?.gridElements
+        data?.data?.cards[1]?.card?.card?.gridElements
           ?.infoWithStyle?.restaurants || [];
           console.log(fetchedRestaurants);
     
