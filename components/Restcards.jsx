@@ -1,28 +1,33 @@
 import React, { useState, useEffect } from "react";
 import { IMG_URL } from "../utils/constants";
 import ShimmerCard from "./Shimmer";
-import { Link } from "react-router";
+import { Link } from "react-router"; // Fixed import
+
+const locationArea = [
+  { name: "Thiruvannamalai", loc: "lat=12.2252841&lng=79.0746957" },
+  { name: "Thirunelveli", loc: "lat=8.715018&lng=77.765628" },
+];
 
 const Restcards = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [search, setSearch] = useState("");
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
+  const [location, setLocation] = useState(locationArea[0].loc); // Default to Thiruvannamalai
 
   const fetchRestaurants = async () => {
     try {
       const response = await fetch(
-        "https://www.swiggy.com/mapi/restaurants/list/v5?offset=0&is-seo-homepage-enabled=true&lat=12.2252841&lng=79.07469569999999&carousel=true&third_party_vendor=1"
+        `https://www.swiggy.com/mapi/restaurants/list/v5?offset=2&is-seo-homepage-enabled=true&${location}&carousel=true&third_party_vendor=1`
       );
       const data = await response.json();
-      console.log(data);
-      
+      console.log("API Response:", data);
 
-      // Extract the restaurants safely from API response
       const fetchedRestaurants =
-        data?.data?.cards[1]?.card?.card?.gridElements
-          ?.infoWithStyle?.restaurants || [];
-          console.log(fetchedRestaurants);
-    
+        data?.data?.cards
+          ?.flatMap((card) => card?.card?.card?.gridElements?.infoWithStyle?.restaurants)
+          .filter(Boolean) || [];
+
+      console.log("Fetched Restaurants:", fetchedRestaurants);
 
       setRestaurants(fetchedRestaurants);
       setFilteredRestaurants(fetchedRestaurants);
@@ -33,7 +38,7 @@ const Restcards = () => {
 
   useEffect(() => {
     fetchRestaurants();
-  }, []);
+  }, [location]); // Fetch restaurants when location changes
 
   // Show shimmer if data is not yet loaded
   if (restaurants.length === 0) {
@@ -48,6 +53,22 @@ const Restcards = () => {
 
   return (
     <div>
+      {/* Location Dropdown */}
+      <div className="text-center my-4">
+        <label className="font-semibold text-lg">Select Location: </label>
+        <select
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className="border p-2 rounded-md"
+        >
+          {locationArea.map((loc, index) => (
+            <option key={index} value={loc.loc}>
+              {loc.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Search & Filter Section */}
       <div className="max-w-md w-full mx-auto mt-8 flex flex-col sm:flex-row items-center gap-4">
         <div className="relative flex-grow w-full">
@@ -61,10 +82,12 @@ const Restcards = () => {
           <button
             onClick={() =>
               setFilteredRestaurants(
-                restaurants.filter((restaurant) =>
-					restaurant?.info?.name.toLowerCase().includes(search.toLowerCase()) ||
-				restaurant?.info?.cuisines.some((cuisine) =>
-				  cuisine.toLowerCase().includes(search.toLowerCase()))
+                restaurants.filter(
+                  (restaurant) =>
+                    restaurant?.info?.name.toLowerCase().includes(search.toLowerCase()) ||
+                    restaurant?.info?.cuisines.some((cuisine) =>
+                      cuisine.toLowerCase().includes(search.toLowerCase())
+                    )
                 )
               )
             }
@@ -88,12 +111,33 @@ const Restcards = () => {
       <div className="max-w-6xl mx-auto py-8 px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {filteredRestaurants.length > 0 ? (
           filteredRestaurants.map((restaurant, index) => (
-            <Link to={`/restaurant/${restaurant?.info?.id}`} key={index} className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+            <Link
+              to={`/restaurant/${restaurant?.info?.id}`}
+              key={index}
+              className="relative bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+            >
+              {/* Veg / Non-Veg Label on Top */}
+              {restaurant?.info?.veg !== undefined && (
+                <span
+                  className={`absolute top-2 left-2 px-3 py-1 text-sm font-semibold rounded-md shadow-md ${
+                    restaurant?.info?.veg ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  <span
+                    className={`inline-block w-3 h-3 mr-2 rounded-full ${
+                      restaurant?.info?.veg ? "bg-green-500" : "bg-red-500"
+                    }`}
+                  ></span>
+                  {restaurant?.info?.veg ? "Pure Veg" : "Non-Veg"}
+                </span>
+              )}
+
               <img
                 src={IMG_URL + restaurant?.info?.cloudinaryImageId}
                 alt={restaurant?.info?.name}
                 className="w-full h-40 object-cover"
               />
+
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-800">{restaurant?.info?.name}</h3>
                 <p className="text-gray-600">{restaurant?.info?.cuisines?.join(", ")}</p>
