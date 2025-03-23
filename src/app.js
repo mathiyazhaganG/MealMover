@@ -7,6 +7,8 @@ import About from '../components/About';
 import Deals from '../components/Deals';
 import { createBrowserRouter,Outlet,RouterProvider } from 'react-router';
 import Menu from '../components/Menu';
+import { Provider } from "react-redux";
+import store from "../utils/appstore";
 
 
 
@@ -20,8 +22,10 @@ import Menu from '../components/Menu';
 const App = () => {
   return (
     <div>
+      <Provider store={store}>  {/* Moved Provider to wrap everything */}
       <Header />
       <Outlet />
+    </Provider>
     </div>
   )
 }

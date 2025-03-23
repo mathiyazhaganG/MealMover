@@ -11,7 +11,8 @@ const Header = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <div className="flex-shrink-0 flex items-center">
+          <div className="flex-shrink-0">
+            <Link to="/">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" className="h-8 w-32 lg:h-12 lg:w-48">
                 {/* Main Logo Container */}
                 <g>
@@ -38,13 +39,19 @@ const Header = () => {
                 <text x="65" y="30" fontFamily="Arial, sans-serif" fontWeight="bold" fontSize="20" fill="#FF6B35">Meal</text>
                 <text x="65" y="48" fontFamily="Arial, sans-serif" fontWeight="bold" fontSize="20" fill="#333333">Mover</text>
               </svg>
+            </Link>
             </div>
 
-            {/* Navigation Items - Visible on all screen sizes */}
-            <div className="flex items-center space-x-2 md:space-x-8">
-             <Link to="/home"  className="text-gray-700 hover:text-orange-500 px-1 md:px-3 py-2 text-sm md:text-base font-medium">Home</Link>
-              <Link to="/about" className="text-gray-700 hover:text-orange-500 px-1 md:px-3 py-2 text-sm md:text-base font-medium">About us</Link>
-              <Link to="/deals" className="text-gray-700 hover:text-orange-500 px-1 md:px-3 py-2 text-sm md:text-base font-medium">Deals</Link>
+          {/* Navigation Links */}
+          <div className="flex space-x-6">
+            <Link to="/home" className="text-gray-700 hover:text-orange-500 font-medium">Home</Link>
+            <Link to="/about" className="text-gray-700 hover:text-orange-500 font-medium">About Us</Link>
+            <Link to="/deals" className="text-gray-700 hover:text-orange-500 font-medium flex items-center gap-2">
+              Cart
+              <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor">
+                <path d="m480-560-56-56 63-64H320v-80h167l-64-64 57-56 160 160-160 160ZM280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z"/>
+              </svg>
+            </Link>
             </div>
           </div>
         </div>
