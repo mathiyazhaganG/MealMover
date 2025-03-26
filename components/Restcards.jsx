@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { IMG_URL } from "../utils/constants";
 import ShimmerCard from "./Shimmer";
-import { Link } from "react-router"; // Fixed import
+import { Link } from "react-router"; // Correct import
 
 const locationArea = [
   { name: "Thiruvannamalai", loc: "lat=12.2252841&lng=79.0746957" },
@@ -12,7 +12,18 @@ const Restcards = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [search, setSearch] = useState("");
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
-  const [location, setLocation] = useState(locationArea[0].loc); // Default to Thiruvannamalai
+  const [location, setLocation] = useState(locationArea[0].loc);
+
+  useEffect(() => {
+    const cachedData = localStorage.getItem(`restaurants_${location}`);
+
+    if (cachedData) {
+      setRestaurants(JSON.parse(cachedData));
+      setFilteredRestaurants(JSON.parse(cachedData));
+    } else {
+      fetchRestaurants();
+    }
+  }, [location]);
 
   const fetchRestaurants = async () => {
     try {
@@ -20,15 +31,13 @@ const Restcards = () => {
         `https://www.swiggy.com/mapi/restaurants/list/v5?offset=2&is-seo-homepage-enabled=true&${location}&carousel=true&third_party_vendor=1`
       );
       const data = await response.json();
-      console.log("API Response:", data);
 
       const fetchedRestaurants =
         data?.data?.cards
           ?.flatMap((card) => card?.card?.card?.gridElements?.infoWithStyle?.restaurants)
           .filter(Boolean) || [];
 
-      console.log("Fetched Restaurants:", fetchedRestaurants);
-
+      localStorage.setItem(`restaurants_${location}`, JSON.stringify(fetchedRestaurants));
       setRestaurants(fetchedRestaurants);
       setFilteredRestaurants(fetchedRestaurants);
     } catch (error) {
@@ -36,11 +45,22 @@ const Restcards = () => {
     }
   };
 
-  useEffect(() => {
-    fetchRestaurants();
-  }, [location]); // Fetch restaurants when location changes
+  const handleSearch = () => {
+    setFilteredRestaurants(
+      restaurants.filter(
+        (restaurant) =>
+          restaurant?.info?.name.toLowerCase().includes(search.toLowerCase()) ||
+          restaurant?.info?.cuisines.some((cuisine) =>
+            cuisine.toLowerCase().includes(search.toLowerCase())
+          )
+      )
+    );
+  };
 
-  // Show shimmer if data is not yet loaded
+  const filterTopRated = () => {
+    setFilteredRestaurants(restaurants.filter((restaurant) => restaurant?.info?.avgRating >= 4.0));
+  };
+
   if (restaurants.length === 0) {
     return (
       <div className="max-w-6xl mx-auto py-8 px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -52,7 +72,7 @@ const Restcards = () => {
   }
 
   return (
-    <div>
+    <div className="pt-20">
       {/* Location Dropdown */}
       <div className="text-center my-4">
         <label className="font-semibold text-lg">Select Location: </label>
@@ -80,17 +100,7 @@ const Restcards = () => {
             className="w-full py-3 pl-10 pr-24 bg-white border border-gray-200 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-700"
           />
           <button
-            onClick={() =>
-              setFilteredRestaurants(
-                restaurants.filter(
-                  (restaurant) =>
-                    restaurant?.info?.name.toLowerCase().includes(search.toLowerCase()) ||
-                    restaurant?.info?.cuisines.some((cuisine) =>
-                      cuisine.toLowerCase().includes(search.toLowerCase())
-                    )
-                )
-              )
-            }
+            onClick={handleSearch}
             className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-orange-500 text-white px-4 py-1.5 rounded-full hover:bg-orange-600 transition-colors shadow-sm font-medium"
           >
             Search
@@ -98,9 +108,7 @@ const Restcards = () => {
         </div>
 
         <button
-          onClick={() =>
-            setFilteredRestaurants(restaurants.filter((restaurant) => restaurant?.info?.avgRating >= 4.0))
-          }
+          onClick={filterTopRated}
           className="bg-orange-500 text-white px-6 py-2 rounded-full hover:bg-orange-600 transition-colors shadow-sm font-medium w-full sm:w-auto"
         >
           Top Rated Restaurants

@@ -4,50 +4,73 @@ import { useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { additem, removeitem } from "../utils/cartslice"; // Import actions from Redux slice
 
+const CACHE_EXPIRY_TIME = 3600000; // 1 Hour in milliseconds
+
 const Menu = () => {
   const [Head, setHead] = useState({});
   const [Categories, setCategories] = useState([]);
   const { id } = useParams();
   const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items); // Get cart items from Redux
+  const cartItems = useSelector((state) => state.cart.items);
 
-  const fetchmenu = async () => {
+  // Fetch menu from API or localStorage
+  const fetchMenu = async () => {
     try {
+      const cachedMenu = localStorage.getItem(`menu_${id}`);
+      
+      if (cachedMenu) {
+        const { head, categories, timestamp } = JSON.parse(cachedMenu);
+        
+        // Check if cache is valid
+        if (Date.now() - timestamp < CACHE_EXPIRY_TIME) {
+          setHead(head);
+          setCategories(categories);
+          return;
+        }
+      }
+
       const response = await fetch(MENU_URL + id);
       const data = await response.json();
 
-      setHead(data?.data?.cards[2]?.card?.card?.info || {});
-      setCategories(
+      const headData = data?.data?.cards[2]?.card?.card?.info || {};
+      const categoriesData =
         data?.data?.cards[5]?.groupedCard?.cardGroupMap?.REGULAR?.cards.filter(
           (c) =>
             c.card?.["card"]?.["@type"] ===
             "type.googleapis.com/swiggy.presentation.food.v2.ItemCategory"
-        ) || []
+        ) || [];
+
+      // Store in localStorage with timestamp
+      localStorage.setItem(
+        `menu_${id}`,
+        JSON.stringify({ head: headData, categories: categoriesData, timestamp: Date.now() })
       );
+
+      setHead(headData);
+      setCategories(categoriesData);
     } catch (error) {
       console.error("Error fetching menu:", error);
     }
   };
 
   useEffect(() => {
-    fetchmenu();
+    fetchMenu();
   }, [id]);
 
   const handleAddItem = (item) => {
-    dispatch(additem(item)); // Add to cart
+    dispatch(additem(item));
   };
 
   const handleRemoveItem = (itemId) => {
-    dispatch(removeitem(itemId)); // Remove from cart
+    dispatch(removeitem(itemId));
   };
 
-  // Function to check if an item is already in the cart
   const isItemInCart = (itemId) => {
     return cartItems.some((cartItem) => cartItem.id === itemId);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4">
+    <div className="min-h-screen bg-gray-100 py-8 px-4 pt-20">
       {/* Header Section */}
       <div className="text-center">
         <h3 className="text-4xl font-extrabold text-gray-800 mb-3 hover:text-orange-500 transition-colors duration-300">
